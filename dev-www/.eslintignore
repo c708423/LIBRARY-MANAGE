@@ -1,0 +1,7 @@
+/build/
+/config/
+/dist/
+/src/components/*.vue
+/*.js
+/test/unit/coverage/
+*.vue
