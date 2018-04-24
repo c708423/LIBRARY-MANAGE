@@ -15,7 +15,7 @@ var queryres = function api_vaild(username, userpwd, callback){
 								ans = {ret_code: 1, ret_msg: '账号或密码错误'};
 						}
 			}else{
-					ans = {ret_code: 3,ret_msg: '账号不存在'};
+					ans = {ret_code: 1,ret_msg: '账号不存在'};
 			}
 			callback(ans);
 		});

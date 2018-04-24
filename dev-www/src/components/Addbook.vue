@@ -55,8 +55,11 @@
         <Panel name='2'>
             批量入库
             <p slot="content">
-              <Button type="primary">csv格式</Button>
-              <Button type="primary">..,..,...格式</Button>
+              <Upload :before-upload="handleUpload"
+                      :on-success="successres"
+                      action="http://127.0.0.1:3000/api/muladd">
+                  <Button type="ghost" icon="ios-cloud-upload-outline">csv格式</Button>
+              </Upload>
             </p>
         </Panel>
         </Collapse>
@@ -70,8 +73,20 @@ export default {
       }
   },
   methods:{
-      addnewbook:function(){
+      successres:function(res,file,filelist){
+          console.log(res.path);
+          this.$http.post(this.GLOBAL.postSite + 'muladdvaild',{
+            name      : localStorage.getItem('username'),
+            password  : localStorage.getItem('password'),
+            path      : res.path
+          }).then(function(res){
 
+          });
+      },
+      handleUpload:function(file){
+          return true;
+      },
+      addnewbook:function(){
           this.$http.post(this.GLOBAL.postSite + 'addbook',{
               name      : localStorage.getItem('username'),
               password  : localStorage.getItem('password'),

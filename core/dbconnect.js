@@ -1,5 +1,5 @@
-var orm = require('orm')
-var opts = require('../config/database')
+var orm = require('orm');
+var opts = require('../config/database');
 
 
 module.exports = function Query(tbname,construct,dowhat,options,callback)  {
@@ -24,10 +24,10 @@ module.exports = function Query(tbname,construct,dowhat,options,callback)  {
 				dbb.delete(options,function(err,ret){
 						if (err) throw err;
 						callback(ret);
-				})
+				});
 		}
 		// connected
 		// ...
 	};
 	orm.connect(opts, getans);
-}
+};

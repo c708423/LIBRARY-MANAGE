@@ -17,6 +17,10 @@
     "session-file-store": "^1.2.0"
   },
   "devDependencies": {
-    "ejs": "^2.5.9"
+    "ejs": "^2.5.9",
+    "eslint-config-airbnb": "^16.1.0",
+    "eslint-plugin-import": "^2.11.0",
+    "eslint-plugin-jsx-a11y": "^6.0.3",
+    "eslint-plugin-react": "^7.7.0"
   }
 }

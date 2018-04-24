@@ -1,4 +1,4 @@
-<style scoped>
+ <style scoped>
 .aline{
   padding-top:10px;
   padding-bottom:10px;
@@ -16,47 +16,63 @@
                 <FormItem label='查询项目'>
                     <Input v-model="value12">
                       <Select v-model="select2" slot="append" style="width: 70px">
-                          <Option value="shuhao">书号</Option>
-                          <Option value="leibie">类别</Option>
-                          <Option value="shuming">书名</Option>
-                          <Option value="chubanshe">出版社</Option>
-                          <Option value="zuozhe">作者</Option>
+                          <Option value="id">书号</Option>
+                          <Option value="bo_type">类别</Option>
+                          <Option value="bo_name">书名</Option>
+                          <Option value="bo_press">出版社</Option>
+                          <Option value="bo_author">作者</Option>
                       </Select>
                     </Input>
                 </FormItem>
               </Col>
               <Col span='6' :style = "{'padding-left':'20px'}">
-                <Button type="primary" shape="circle" icon="ios-search" long>Search</Button>
+                <Button type="primary" shape="circle" icon="ios-search" @click = 'searchbook'long>Search</Button>
               </Col>
             </Row>
             <Row :gutter="16">
                 <Col span = '12'>
                     <FormItem label = "价格范围">
-                        <Input v-model="value12" placeholder='价格的起始范围，默认为0' class='aline'>
+                        <Input v-model="price_low" placeholder='价格的起始范围，默认为0' class='aline'>
                         </Input>
-                        <Input v-model="value12" placeholder='价格的截止范围，默认为无穷'>
+                        <Input v-model="price_high" placeholder='价格的截止范围，默认为无穷'>
                         </Input>
                     </FormItem>
                 </Col>
                 <Col span = '12'>
                     <FormItem label = "年份">
-                        <Input v-model="value12" placeholder='价格的起始范围，默认为0' class='aline'>
+                        <Input v-model="year_low" placeholder='价格的起始范围，默认为0' class='aline'>
                         </Input>
-                        <Input v-model="value12" placeholder='价格的截止范围，默认为无穷'>
+                        <Input v-model="year_high" placeholder='价格的截止范围，默认为无穷'>
                         </Input>
                     </FormItem>
                 </Col>
             </Row>
         </Form>
         <br/>
-        <Booktable></Booktable>
+        <Booktable v-bind:data7 = "formdata"></Booktable>
     </Card>
 </template>
 <script>
 import Booktable from './booktable'
 export default {
+  data (){
+      return{
+          formdata : [],
+          value12  : '',
+          select2  : ''
+      }
+  },
   components: {
     'Booktable': Booktable
+  },
+  methods: {
+    searchbook: function(){
+        this.$http.post(this.GLOBAL.postSite + 'searchbook',
+        {type:this.select2,content:this.value12}).then(function(res){
+          console.log(res);
+          this.formdata = res.body;
+        });
+    }
   }
 }
 </script>
