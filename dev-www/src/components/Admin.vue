@@ -3,7 +3,7 @@
         background: #f5f7f9;
         position: relative;
         overflow: hidden;
-        height:540px;
+        height:100%;
     }
     .layout-header-bar{
         background: #fff;

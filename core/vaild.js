@@ -10,7 +10,7 @@ var queryres = function api_vaild(username, userpwd, callback){
 			if (queryres.length != 0 ){
 						if(queryres[0].password == userpwd){
 								//console.log(req.session.loginUser);
-								ans = {ret_code: 0, ret_msg: '登录成功'};
+								ans = {ret_code: 0, ret_msg: '登录成功',admin_id: queryres[0].id};
 						}else{
 								ans = {ret_code: 1, ret_msg: '账号或密码错误'};
 						}

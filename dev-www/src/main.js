@@ -7,7 +7,9 @@ import iView from 'iview'
 import VueResource from 'vue-resource'
 import 'iview/dist/styles/iview.css'
 import global_ from './components/Global'
+import md5 from '../static/md5.js'
 Vue.prototype.GLOBAL = global_
+Vue.prototype.MD5 = md5
 Vue.use(VueResource)
 Vue.config.productionTip = false
 Vue.use(iView)

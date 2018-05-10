@@ -36,8 +36,6 @@
                       </a>
                       <DropdownMenu slot="list">
                           <router-link to="/login"><DropdownItem>登陆</DropdownItem></router-link>
-                          <DropdownItem>修改密码</DropdownItem>
-                          <DropdownItem>用户资料</DropdownItem>
                           <a @click="Logout"><DropdownItem divided>登出</DropdownItem></a>
                       </DropdownMenu>
                   </Dropdown>
@@ -48,6 +46,20 @@
 </template>
 <script>
 export default {
+  data:function(){
+    return {
+      loginstatus : 0
+    }
+  },
+  mounted:function(){
+    if (localStorage.getItem('username') == null) {
+        console.log('0');
+        this.loginstatus = 0;
+    } else {
+        console.log('1');
+        this.loginstatus = 1;
+    }
+  },
   methods:{
       Logout:function(){
           console.log(localStorage.getItem('username'));
@@ -56,6 +68,7 @@ export default {
           } else {
               this.$Message.success("成功登出");
               localStorage.clear();
+              this.loginstatus = 0;
           }
         /*
           if (localStorage.getItem('username')){
@@ -65,6 +78,7 @@ export default {
               this.GLOBAL.LoginStatus = false;
               localStorage.clear();
           }*/
+
       }
   }
 }

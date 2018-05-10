@@ -80,7 +80,11 @@ export default {
             password  : localStorage.getItem('password'),
             path      : res.path
           }).then(function(res){
-
+            if (res.body.ret_code == 0 ){
+                this.$Message.success(res.body.ret_msg);
+            } else {
+                this.$Message.error(res.body.ret_msg);
+            }
           });
       },
       handleUpload:function(file){

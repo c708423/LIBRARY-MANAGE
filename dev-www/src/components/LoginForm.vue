@@ -89,16 +89,18 @@ export default {
           this.$Message.error('已登陆');
           return;
       }
-      this.$http.post(this.GLOBAL.postSite + 'Login',{name:this.formInline.user,password:this.formInline.password}).then(
+      console.log(this.MD5.pwd(this.formInline.password));
+      this.$http.post(this.GLOBAL.postSite + 'Login',{name:this.formInline.user,password:this.MD5.pwd(this.formInline.password)}).then(
             function (res) {
                 // 处理成功的结果
-                console.log(res.body);
                 if (res.body.ret_code == 0){
                     this.$Message.success('成功登陆');
                     this.GLOBAL.LoginStatus = true;
                     console.log(localStorage.getItem('username'));
                     localStorage.setItem('username',this.formInline.user);
-                    localStorage.setItem('password',this.formInline.password);
+                    localStorage.setItem('password',this.MD5.pwd(this.formInline.password));
+                    //console.log('$root.bus',this.$root.Bus);
+                    //this.$root.Bus.$emit('loginchange',1);
                 } else if (res.body.ret_code == 1){
                     this.$Message.error('密码错误')
                 } else if (res.body.ret_code == 3) {

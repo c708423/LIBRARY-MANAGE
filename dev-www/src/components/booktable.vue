@@ -82,10 +82,14 @@ export default {
     },
     methods:{
         datachange:function(){
-            console.log('chage');
+            console.log('data7',this.data7.length);
             this.Curpage = 1;
             this.dataCount = this.data7.length;
-            this.data = this.data7.slice(0,10);
+            if (this.data7.length != 0){
+                this.data = this.data7.slice(0,10);
+            }else{
+              this.data = [];
+            }
         },
         changeme(page){
             console.log(page);

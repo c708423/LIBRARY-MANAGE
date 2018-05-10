@@ -26,15 +26,15 @@ var card_define = {
 		active : Number
 };
 
-function ConvertToTable(data, callBack) {
+function ConvertToTable(data) {
     data = data.toString();
     var table = [];
     var rows = [];
-    rows = data.split("\n");
+    rows = data.split("\r\n");
     for (var i = 0; i < rows.length; i++) {
         table.push(rows[i].split(","));
     }
-    callBack(table);
+    return table;
 }
 
 router.post('/Login', function(req, res) {
@@ -53,41 +53,28 @@ router.post('/muladd', multipartMiddleware ,function(req, res) {
 router.post('/muladdvaild',function(req, res) {
 	vaild(req.body.name,req.body.password,function(result){
 					if (result.ret_code == 0 ){
-							console.log(req.body.path);
-							fs.readFile(req.body.path,function(err,data){
-									ConvertToTable(data, function (table) {
-							        for (var i = 1; i < table.length; i++){
-													if (table[i][0] != '' ) {
-														dbcon('book',book_define,'search',{id : req.body.bo_id},function(result){
-																console.log(result);
-																if (result.length ==0){ //该书不存在所以要新建记录
-																		res.json({ret_code:0,ret_msg:"新增图书"});
-																		dbcon('book',book_define,'create',{
-																			id        : table[i][0],
-																			bo_type   : req.body.bo_type,
-																			bo_name   : req.body.bo_name,
-																			bo_press  : req.body.bo_press,
-																			bo_year   : req.body.bo_year,
-																			bo_author : req.body.bo_author,
-																			bo_price  : req.body.bo_price,
-																			bo_sum    : req.body.bo_num,
-																			bo_store  : req.body.bo_num
-																		});
-																} else { //该书存在所以 bo_store ++ bo_sum ++
-																		console.log('add store');
-																		res.json({ret_code:0,ret_msg:"图书入库"});
-																		result[0].bo_store = result[0].bo_store + req.body.bo_num;
-																		result[0].bo_sum = result[0].bo_sum + req.body.bo_num;
-																		result[0].save();
-																}
-														});
-													}
+							fs.readFile(req.body.path,async function(err,data){
+									var data = ConvertToTable(data);
+									for (i = 1; i<= data.length; i++){
+											if (data[i][0] != ''){
+												var dataobj = {
+													id     : data[i][0],
+													bo_type   : data[i][1],
+													bo_name   : data[i][2],
+													bo_press  : data[i][3],
+													bo_year   : data[i][4],
+													bo_author : data[i][5],
+													bo_price  : data[i][6],
+													bo_sum    : data[i][7]
+												}
+												var ret = await mysqlcon.add_book(dataobj);
+												console.log(ret);
 											}
-							    });
+									}
 							});
-
+							res.json({ret_code:0,ret_msg:"入库成功"});
 					}else{
-
+							res.json({ret_code:1,ret_msg:"身份验证失败"});
 					}
 			});
 });
@@ -141,34 +128,75 @@ router.post('/addcard',function(req,res){
 				}
 		});
 });
-router.post('/addbook', function(req, res) {
-		vaild(req.body.name,req.body.password,function(result){
-				if (result.ret_code == 0){  //验证通过
-						console.log("验证通过");
-						dbcon('book',book_define,'search',{id : req.body.bo_id},function(result){
-								console.log(result);
-								if (result.length ==0){ //该书不存在所以要新建记录
-										console.log('create new');
-										res.json({ret_code:0,ret_msg:"新增图书"});
-										dbcon('book',book_define,'create',{
-											id     : req.body.bo_id,
-											bo_type   : req.body.bo_type,
-											bo_name   : req.body.bo_name,
-											bo_press  : req.body.bo_press,
-											bo_year   : req.body.bo_year,
-											bo_author : req.body.bo_author,
-											bo_price  : req.body.bo_price,
-											bo_sum    : req.body.bo_num,
-											bo_store  : req.body.bo_num
+router.post('/returnbook',function(req,res){
+	vaild(req.body.name, req.body.password,async function(result){
+			if (result.ret_code == 0){
+				var p =  await mysqlcon.return_book(req.body.cardid,req.body.bookid,result.admin_id);
+				res.json(p);
+			} else {
+				res.json({ret_code:1,ret_msg:"身份验证失败"});
+			}
+	})
+})
+router.post('/borrowbook',function(req,res){
+	vaild(req.body.name, req.body.password,async function(result){
+			if (result.ret_code == 0){
+					var p =  await mysqlcon.borrow_book(req.body.cardid,req.body.bookid,result.admin_id);
+					console.log(p);
+					res.json(p);
+			} else {
+					res.json({ret_code:1,ret_msg:"身份验证失败"});
+			}
+	});
+});
+
+router.post('/searchcard', function(req,res){
+		var ret_data = [];
+		vaild(req.body.name, req.body.password,function(result){
+				if (result.ret_code == 0){
+						console.log(req.body.id);
+						dbcon('card',card_define,'search',{id : req.body.id},async function(result){
+								if (result.length == 0){
+										res.json({ret_code:1,ret_msg:"书卡未找到"});
+								}	else {
+										formdata = await mysqlcon.getborrowed(req.body.id);
+										if (formdata.get == 0 ){
+												ret_data = [];
+										} else {
+												ret_data = formdata.data;
+										}
+										res.json({
+											ret_code : 0,
+											name     : result[0].name,
+											type     : result[0].type,
+											com      : result[0].com,
+											ret_msg  : "查询成功",
+											data     : ret_data
 										});
-								} else { //该书存在所以 bo_store ++ bo_sum ++
-										console.log('add store');
-										res.json({ret_code:0,ret_msg:"图书入库"});
-										result[0].bo_store = result[0].bo_store + req.body.bo_num;
-										result[0].bo_sum = result[0].bo_sum + req.body.bo_num;
-										result[0].save();
 								}
 						});
+				}	else {
+						res.json({ret_code:1,ret_msg:"身份验证失败"});
+				}
+		});
+});
+router.post('/addbook', function(req, res) {
+		vaild(req.body.name,req.body.password,async function(result){
+				if (result.ret_code == 0){  //验证通过
+						console.log("验证通过");
+						var sqlres = await mysqlcon.add_book({
+							id        : req.body.bo_id,
+							bo_type   : req.body.bo_type,
+							bo_name   : req.body.bo_name,
+							bo_press  : req.body.bo_press,
+							bo_year   : req.body.bo_year,
+							bo_author : req.body.bo_author,
+							bo_price  : req.body.bo_price,
+							bo_sum    : req.body.bo_num,
+							bo_store  : req.body.bo_num
+						});
+						if (sqlres == 0) res.json({ret_code:0,ret_msg:"入库成功"});
+						else res.json({ret_code:2,ret_msg:"入库失败"})
 				} else {
 						res.json({ret_code:1,ret_msg:"身份验证失败"});
 				}
